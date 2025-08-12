@@ -1,7 +1,6 @@
-package main.java.kuiyomi;
+package kuiyomi;
 
 public class Motor {
-
     private TipoCombustivel tipoMotor;
     private int consumo; // em quilometros por unidade. Ex: Km/Lt
     private int quilometragem;
@@ -15,11 +14,11 @@ public class Motor {
         return this.consumo;
     }
 
-    public TipoCombustivel getTipoMotor(){
+    public TipoCombustivel getTipoMotor() {
         return this.tipoMotor;
     }
 
-    public int getQuilometragem(){
+    public int getQuilometragem() {
         return this.quilometragem;
     }
 

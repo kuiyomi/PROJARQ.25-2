@@ -1,7 +1,6 @@
-package main.java.kuiyomi;
+package kuiyomi;
 
 public class TanqueCombustivel {
-
     private TipoCombustivel tipoCombustivel;
     private int capacidade;
     private int combustivelDisponivel;
@@ -58,5 +57,4 @@ public class TanqueCombustivel {
         return "TanqueCombustivel [capacidade=" + capacidade + ", combustivelDisponivel=" + combustivelDisponivel
                 + ", tipoCombustivel=" + tipoCombustivel + "]";
     }
-
 }

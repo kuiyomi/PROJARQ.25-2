@@ -1,15 +1,21 @@
-package main.java.kuiyomi;
+package kuiyomi;
 
 public class Carro {
-
-    private String modelo;
-    private Motor motor;
-    private TanqueCombustivel tanque;
+    protected String modelo;
+    protected Motor motor;
+    protected TanqueCombustivel tanque;
 
     public Carro(String modelo, TipoCombustivel tipoCombustivel, int consumoMotor, int capacidadeTanque) {
         this.modelo = modelo;
         motor = new Motor(tipoCombustivel, consumoMotor);
         tanque = new TanqueCombustivel(tipoCombustivel, capacidadeTanque);
+    }
+
+    public Carro(String modelo, TipoCombustivel tipoMotor, int consumoMotor, int capacidadeTanque,
+            TipoCombustivel tipoTanque) {
+        this.modelo = modelo;
+        motor = new Motor(tipoMotor, consumoMotor);
+        tanque = new TanqueCombustivel(tipoTanque, capacidadeTanque);
     }
 
     public String getModelo() {

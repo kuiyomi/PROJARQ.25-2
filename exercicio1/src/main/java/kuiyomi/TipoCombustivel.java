@@ -1,5 +1,5 @@
-package main.java.kuiyomi;
+package kuiyomi;
 
 public enum TipoCombustivel {
-    GASOLINA,ALCOOL,FLEX;
+    GASOLINA,ALCOOL,FLEX, DIESEL;
 }
