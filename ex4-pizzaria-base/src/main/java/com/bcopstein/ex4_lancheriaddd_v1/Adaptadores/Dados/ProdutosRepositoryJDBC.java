@@ -65,5 +65,11 @@ public class ProdutosRepositoryJDBC implements ProdutosRepository {
         );
         return produtos.isEmpty() ? null : produtos.getFirst();        
     }
+
+    // acho que nao precisa de anotação override ????
+    public void marcaIndisponivel(long produtoId){
+        String sql = "UPDATE produtos SET disponivel = false WHERE id = ?";
+        this.jdbcTemplate.update(sql, produtoId);
+    }
     
 }
