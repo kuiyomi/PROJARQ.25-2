@@ -58,41 +58,16 @@ public class PedidoService {
 
     // submete pedido para aprovação: retorna ResultadoAprovacao. Não faz pagamento.
     public ResultadoAprovacao submeteParaAprovacao(String clienteCpf, List<ItemPedido> itens) {
-        // calcula necessidade por ingrediente (assume 1 por ingrediente por unidade do produto) > deveria ser baseado na receita (????)
-        Map<Long, Integer> necessidadePorIngrediente = new HashMap<>();
-        Map<Long, Long> produtoPorIngrediente = new HashMap<>(); // map ingrediente e produto (para marcar indisponivel)
-        List<Produto> produtosEnvolvidos = new ArrayList<>();
-        for (ItemPedido ip : itens) {
-            Produto p = produtosRepository.recuperaProdutoPorid(ip.getItem().getId());
-            produtosEnvolvidos.add(p);
-            for (Ingrediente ing : p.getReceita().getIngredientes()) {
-                necessidadePorIngrediente.merge(ing.getId(), ip.getQuantidade(), Integer::sum);
-                produtoPorIngrediente.put(ing.getId(), p.getId());
+        // produtos indisponiveis
+        List<Long> produtosIndisponiveis = new ArrayList<>();
+        for (ItemPedido itemPedido : itens) {
+            Produto produto = produtosRepository.recuperaProdutoPorid(itemPedido.getItem().getId());
+            if (produto == null ) {
+                produtosIndisponiveis.add(itemPedido.getItem().getId());
             }
         }
-
-        // so precisa checar disponibilidade (muitas responsabilidades pro mesmo servico)
-        // so checa o estoque
-        Set<Long> ingredientesEmFalta = new HashSet<>();
-        for (var entry : necessidadePorIngrediente.entrySet()) {
-            long ingId = entry.getKey();
-            int need = entry.getValue();
-            var ie = itemEstoqueRepository.recuperaPorIngredienteId(ingId);
-            int available = ie == null ? 0 : ie.getQuantidade();
-            if (available < need) ingredientesEmFalta.add(ingId);
-        }
-
-        // produtos indisponiveis
-        List<Long> produtosIndisponiveis = ingredientesEmFalta.stream()
-            .map(produtoPorIngrediente::get)
-            .filter(Objects::nonNull).distinct()
-            .collect(Collectors.toList());
 
         if (!produtosIndisponiveis.isEmpty()) {
-            // marca produtos como indisponiveis
-            for (Long prodId : produtosIndisponiveis) {
-                jdbcMarcaProdutoIndisponivel(prodId);
-            }
             return new ResultadoAprovacao(false, produtosIndisponiveis, 0,0,0,0, -1);
         }
 
@@ -112,20 +87,7 @@ public class PedidoService {
         long pedidoId = pedidosRepository.inserePedido(clienteCpf, Pedido.Status.APROVADO.name(), soma, impostos, desconto, valorCobrado);
         pedidosRepository.insereItensPedido(pedidoId, itens);
 
-        // reduz estoque de ingredientes
-        for (var entry : necessidadePorIngrediente.entrySet()) {
-            itemEstoqueRepository.reduzQuantidade(entry.getKey(), entry.getValue());
-        }
-
         return new ResultadoAprovacao(true, List.of(), soma, desconto, impostos, valorCobrado, pedidoId);
     }
 
-    // so serve pra colocar o produto.disponivel = false
-    private void jdbcMarcaProdutoIndisponivel(long produtoId) {
-        String sql = "UPDATE produtos SET disponivel = false WHERE id = ?";
-        produtosRepository.getClass();
-        if (produtosRepository instanceof com.bcopstein.ex4_lancheriaddd_v1.Adaptadores.Dados.ProdutosRepositoryJDBC) {
-            ((com.bcopstein.ex4_lancheriaddd_v1.Adaptadores.Dados.ProdutosRepositoryJDBC)produtosRepository).marcaIndisponivel(produtoId);
-        }
-    }
 }
