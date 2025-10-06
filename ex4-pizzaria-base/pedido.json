@@ -1,0 +1,8 @@
+{
+    "clienteCpf": "9001",
+    "itens": [
+        { "produtoId": 1, "quantidade": 1 },
+        { "produtoId": 2, "quantidade": 1 }
+    ],
+    "endereco": "Rua Teste, 123"
+}
