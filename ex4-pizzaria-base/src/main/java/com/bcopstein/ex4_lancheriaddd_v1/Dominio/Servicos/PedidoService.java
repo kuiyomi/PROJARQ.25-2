@@ -18,15 +18,19 @@ public class PedidoService {
     private final PedidosRepository pedidosRepository;
     private final ImpostoService impostoService;
     private final DescontoService descontoService;
+    @Autowired
+    private PagamentoService pagamentoService;
+    @Autowired
+    private CozinhaService cozinhaService;
 
     @Autowired
     public PedidoService(ProdutosRepository produtosRepository,
-                         ReceitasRepository receitasRepository,
-                         IngredientesRepository ingredientesRepository,
-                         ItemEstoqueRepository itemEstoqueRepository,
-                         PedidosRepository pedidosRepository,
-                         ImpostoService impostoService,
-                         DescontoService descontoService){
+            ReceitasRepository receitasRepository,
+            IngredientesRepository ingredientesRepository,
+            ItemEstoqueRepository itemEstoqueRepository,
+            PedidosRepository pedidosRepository,
+            ImpostoService impostoService,
+            DescontoService descontoService) {
         this.produtosRepository = produtosRepository;
         this.receitasRepository = receitasRepository;
         this.ingredientesRepository = ingredientesRepository;
@@ -45,7 +49,8 @@ public class PedidoService {
         public final double valorCobrado;
         public final long pedidoId;
 
-        public ResultadoAprovacao(boolean aprovado, List<Long> produtosIndisponiveis, double valor, double desconto, double impostos, double valorCobrado, long pedidoId) {
+        public ResultadoAprovacao(boolean aprovado, List<Long> produtosIndisponiveis, double valor, double desconto,
+                double impostos, double valorCobrado, long pedidoId) {
             this.aprovado = aprovado;
             this.produtosIndisponiveis = produtosIndisponiveis;
             this.valor = valor;
@@ -62,20 +67,20 @@ public class PedidoService {
         List<Long> produtosIndisponiveis = new ArrayList<>();
         for (ItemPedido itemPedido : itens) {
             Produto produto = produtosRepository.recuperaProdutoPorid(itemPedido.getItem().getId());
-            if (produto == null ) {
+            if (produto == null) {
                 produtosIndisponiveis.add(itemPedido.getItem().getId());
             }
         }
 
         if (!produtosIndisponiveis.isEmpty()) {
-            return new ResultadoAprovacao(false, produtosIndisponiveis, 0,0,0,0, -1);
+            return new ResultadoAprovacao(false, produtosIndisponiveis, 0, 0, 0, 0, -1);
         }
 
         // se tiver tudo ok, calcula preço
         double soma = 0.0;
         for (ItemPedido ip : itens) {
             Produto p = produtosRepository.recuperaProdutoPorid(ip.getItem().getId());
-            soma += ((double)p.getPreco()) * ip.getQuantidade();
+            soma += ((double) p.getPreco()) * ip.getQuantidade();
         }
         double descontoPercent = descontoService.percentualDescontoSeElegivel(clienteCpf);
         double desconto = soma * descontoPercent;
@@ -84,10 +89,30 @@ public class PedidoService {
         double valorCobrado = base + impostos;
 
         // salva pedido (status APROVADO)
-        long pedidoId = pedidosRepository.inserePedido(clienteCpf, Pedido.Status.APROVADO.name(), soma, impostos, desconto, valorCobrado);
+        long pedidoId = pedidosRepository.inserePedido(clienteCpf, Pedido.Status.APROVADO.name(), soma, impostos,
+                desconto, valorCobrado);
         pedidosRepository.insereItensPedido(pedidoId, itens);
 
         return new ResultadoAprovacao(true, List.of(), soma, desconto, impostos, valorCobrado, pedidoId);
+    }
+
+    public void pagarPedido(long pedidoId, String meioPagamento) {
+        var p = pedidosRepository.recuperaPorId(pedidoId);
+        if (p == null)
+            throw new IllegalArgumentException("Pedido inexistente");
+        if (p.getStatus() != Pedido.Status.APROVADO)
+            throw new IllegalStateException("Apenas pedidos APROVADOS podem ser pagos");
+
+        boolean ok = pagamentoService.processarPagamento(meioPagamento, p.getValorCobrado());
+        if (!ok)
+            throw new IllegalStateException("Pagamento recusado");
+
+        pedidosRepository.atualizaStatus(pedidoId, Pedido.Status.PAGO.name());
+
+        // agora vai para a cozinha
+        p.setStatus(Pedido.Status.AGUARDANDO);
+        pedidosRepository.atualizaStatus(pedidoId, Pedido.Status.AGUARDANDO.name());
+        cozinhaService.chegadaDePedido(p);
     }
 
 }

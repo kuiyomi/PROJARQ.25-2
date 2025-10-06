@@ -94,4 +94,12 @@ public class PedidosRepositoryJDBC implements PedidosRepository {
     public void atualizaStatus(long id, String status) {
         jdbcTemplate.update("UPDATE pedidos SET status = ? WHERE id = ?", status, id);
     }
+
+    @Override
+    public void registraPagamento(long id, LocalDateTime dataHora) {
+        jdbcTemplate.update("UPDATE pedidos SET status = ?, data_hora_pagamento = ? WHERE id = ?",        
+        Pedido.Status.PAGO.name(),
+        dataHora == null ? null : Timestamp.valueOf(dataHora),
+        id);
+}
 }
