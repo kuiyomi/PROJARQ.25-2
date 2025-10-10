@@ -1,7 +1,6 @@
 package com.bcopstein.ex4_lancheriaddd_v1.Dominio.Servicos;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,6 @@ public class PedidoService {
     @Autowired
     private CozinhaService cozinhaService;
 
-    @Autowired
     public PedidoService(ProdutosRepository produtosRepository,
             ReceitasRepository receitasRepository,
             IngredientesRepository ingredientesRepository,

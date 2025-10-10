@@ -6,7 +6,6 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -23,7 +22,6 @@ public class PedidosRepositoryJDBC implements PedidosRepository {
     private final JdbcTemplate jdbcTemplate;
     private final ProdutosRepository produtosRepository;
 
-    @Autowired
     public PedidosRepositoryJDBC(JdbcTemplate jdbcTemplate, ProdutosRepository produtosRepository){
         this.jdbcTemplate = jdbcTemplate;
         this.produtosRepository = produtosRepository;
