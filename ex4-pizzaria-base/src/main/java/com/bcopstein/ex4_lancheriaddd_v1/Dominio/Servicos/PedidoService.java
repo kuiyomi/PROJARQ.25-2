@@ -94,23 +94,6 @@ public class PedidoService {
         return new ResultadoAprovacao(true, List.of(), soma, desconto, impostos, valorCobrado, pedidoId);
     }
 
-    public void pagarPedido(long pedidoId, String meioPagamento) {
-        var p = pedidosRepository.recuperaPorId(pedidoId);
-        if (p == null)
-            throw new IllegalArgumentException("Pedido inexistente");
-        if (p.getStatus() != Pedido.Status.APROVADO)
-            throw new IllegalStateException("Apenas pedidos APROVADOS podem ser pagos");
-
-        boolean ok = pagamentoService.processarPagamento(meioPagamento, p.getValorCobrado());
-        if (!ok)
-            throw new IllegalStateException("Pagamento recusado");
-
-        pedidosRepository.atualizaStatus(pedidoId, Pedido.Status.PAGO.name());
-
-        // agora vai para a cozinha
-        p.setStatus(Pedido.Status.AGUARDANDO);
-        pedidosRepository.atualizaStatus(pedidoId, Pedido.Status.AGUARDANDO.name());
-        cozinhaService.chegadaDePedido(p);
-    }
+    
 
 }

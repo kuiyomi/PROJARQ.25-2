@@ -11,9 +11,8 @@ import org.springframework.stereotype.Service;
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Dados.PedidosRepository;
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.Pedido;
 
-// implementar interface
 @Service
-public class EntregaService {
+public class EntregaService implements IEntrgaService {
     private final PedidosRepository pedidosRepository;
     private final Queue<Long> filaEntrega = new LinkedBlockingQueue<>();
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -22,6 +21,7 @@ public class EntregaService {
         this.pedidosRepository = pedidosRepository;
     }
 
+    @Override
     public void enfileirar(long pedidoId){
         filaEntrega.add(pedidoId);
         // Simula atribuição a entregador e entrega
@@ -32,4 +32,7 @@ public class EntregaService {
                 5, TimeUnit.SECONDS);
         }, 2, TimeUnit.SECONDS);
     }
+
+
+
 }
