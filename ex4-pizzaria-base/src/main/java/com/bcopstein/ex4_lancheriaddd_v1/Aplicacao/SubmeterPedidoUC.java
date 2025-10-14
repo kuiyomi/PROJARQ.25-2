@@ -24,8 +24,7 @@ public class SubmeterPedidoUC {
         this.produtosRepository = produtosRepository;
     }
 
-    public PedidoResponse run(PedidoRequest req){
-        // so monta lista do ItemPedido 
+    public PedidoResponse run(PedidoRequest req, String clienteCpf){
         List<ItemPedido> itens = req.itens.stream()
             .map(i -> {
                 var prod = produtosRepository.recuperaProdutoPorid(i.produtoId);
@@ -34,7 +33,9 @@ public class SubmeterPedidoUC {
             })
             .collect(Collectors.toList());
 
-        var res = pedidoService.submeteParaAprovacao(req.clienteCpf, itens);
+
+        var res = pedidoService.submeteParaAprovacao(clienteCpf, itens);
+        
         PedidoResponse r = new PedidoResponse();
         r.aprovado = res.aprovado;
         r.produtosIndisponiveis = res.produtosIndisponiveis;
