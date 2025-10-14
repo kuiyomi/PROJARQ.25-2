@@ -1,5 +1,6 @@
 package com.bcopstein.ex4_lancheriaddd_v1.Dominio.Dados;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -12,4 +13,8 @@ public interface PedidosRepository {
     Pedido recuperaPorId(long id);
     int contaPedidosClienteEntre(String cpf, LocalDateTime de, LocalDateTime ate);
     void atualizaStatus(long id, String status);
+    void registraPagamento(long id, java.time.LocalDateTime dataHora);
+    List<Pedido> findPedidosEntreguesPorClienteEntreDatas(String clienteEmail, LocalDate dataInicio, LocalDate dataFim);
+    List<Pedido> findPedidosEntreguesEntreDatas(LocalDate dataInicio, LocalDate dataFim);
+
 }

@@ -1,7 +1,6 @@
-package com.paulo.demo_teste1_spring;
+package com.bcopstein.ex4_lancheriaddd_v1.Security;
 
 import javax.sql.DataSource;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -24,20 +23,17 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-      http
-          .csrf(csrf -> csrf.disable())
-          .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-          .authorizeHttpRequests(auth -> auth
-              .requestMatchers("/h2-console/**").permitAll()
-              .requestMatchers("/api/welcome", "/api/usuarios").permitAll()
-              .requestMatchers("/api/livros").hasRole("BIBLIOTECARIO")
-              .requestMatchers("/api/livros/**").authenticated()
-              .anyRequest().denyAll()
-          )
-          .httpBasic(Customizer.withDefaults());
 
-      return http.build();
-  }
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/clientes/registrar").permitAll()
+                .anyRequest().authenticated()
+            )
+            .httpBasic(Customizer.withDefaults());
+
+        return http.build();
+    }
 }

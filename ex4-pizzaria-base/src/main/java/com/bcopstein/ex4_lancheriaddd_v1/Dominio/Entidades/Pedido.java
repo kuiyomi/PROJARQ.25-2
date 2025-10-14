@@ -1,5 +1,6 @@
 package com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades;
 
+import java.time.LocalDate; 
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -12,7 +13,8 @@ public class Pedido {
         PREPARACAO,
         PRONTO,
         TRANSPORTE,
-        ENTREGUE
+        ENTREGUE,
+        CANCELADO
     }
     private long id;
     private Cliente cliente;
@@ -23,6 +25,7 @@ public class Pedido {
     private double impostos;
     private double desconto;
     private double valorCobrado;
+    private LocalDate data_pedido; 
 
     public Pedido(long id, Cliente cliente, LocalDateTime dataHoraPagamento, List<ItemPedido> itens,
             Pedido.Status status, double valor, double impostos, double desconto, double valorCobrado) {
@@ -35,6 +38,7 @@ public class Pedido {
         this.impostos = impostos;
         this.desconto = desconto;
         this.valorCobrado = valorCobrado;
+        this.data_pedido = LocalDate.now(); 
     }
 
     public long getId() {
@@ -75,5 +79,10 @@ public class Pedido {
 
     public double getValorCobrado() {
         return valorCobrado;
+    }
+
+    // GETTER PARA O NOVO CAMPO
+    public LocalDate getData_pedido() {
+        return data_pedido;
     }
 }
