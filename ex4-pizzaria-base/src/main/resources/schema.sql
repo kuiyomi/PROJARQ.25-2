@@ -86,3 +86,16 @@ create table if not exists itens_pedido (
   foreign key (pedido_id) references pedidos(id),
   foreign key (produto_id) references produtos(id)
 );
+
+reate table if not exists users (
+  username VARCHAR(50) NOT NULL PRIMARY KEY, -- Aqui será guardado o email do cliente
+  password VARCHAR(500) NOT NULL,
+  enabled BOOLEAN NOT NULL
+);
+
+-- Tabela que o Spring Security usa para autorização (papéis/roles)
+reate table if not exists authorities (
+  username VARCHAR(50) NOT NULL,
+  authority VARCHAR(50) NOT NULL,
+  CONSTRAINT fk_authorities_users FOREIGN KEY(username) REFERENCES users(username)
+);
