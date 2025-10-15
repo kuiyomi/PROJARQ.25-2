@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Dados.PedidosRepository;
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.Pedido;
 
-@Service //transofmrar em spring
+@Service
 public class CozinhaService {
     private Queue<Pedido> filaEntrada;
     private Pedido emPreparacao;
@@ -20,7 +20,7 @@ public class CozinhaService {
     private ScheduledExecutorService scheduler;
 
     private final PedidosRepository pedidosRepository;
-    private final EntregaService entregaService; // simulacao de entrega
+    private final EntregaService entregaService;
 
     public CozinhaService(PedidosRepository pedidosRepository, EntregaService entregaService) {
         this.pedidosRepository = pedidosRepository;
@@ -35,12 +35,10 @@ public class CozinhaService {
         pedido.setStatus(Pedido.Status.PREPARACAO);
         emPreparacao = pedido;
         System.out.println("Pedido em preparacao: "+pedido);
-        // Agenda pedidoPronto para ser chamado em 2 segundos
         scheduler.schedule(() -> pedidoPronto(), 5, TimeUnit.SECONDS);
     }
 
     public synchronized void chegadaDePedido(Pedido p) {
-        //Atualiza no banco que o pedido chegou à cozinha
         p.setStatus(Pedido.Status.AGUARDANDO);
         pedidosRepository.atualizaStatus(p.getId(), Pedido.Status.AGUARDANDO.name());
         
@@ -59,7 +57,6 @@ public class CozinhaService {
         entregaService.enfileirar(emPreparacao.getId());
 
         emPreparacao = null;
-        // Se tem pedidos na fila, programa a preparação para daqui a 1 segundo
         if (!filaEntrada.isEmpty()){
             Pedido prox = filaEntrada.poll();
             scheduler.schedule(() -> colocaEmPreparacao(prox), 1, TimeUnit.SECONDS);

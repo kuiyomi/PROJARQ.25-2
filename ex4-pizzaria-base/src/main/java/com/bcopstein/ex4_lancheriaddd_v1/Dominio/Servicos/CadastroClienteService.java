@@ -24,12 +24,10 @@ public class CadastroClienteService {
 
     @Transactional 
     public void run(String nome, String cpf, String celular, String endereco, String email, String senha) {
-        // A verificação de e-mail existente continua aqui
         if (userDetailsManager.userExists(email)) {
             throw new IllegalArgumentException("O e-mail informado já está cadastrado.");
         }
 
-        // 1. Cria o usuário no sistema de segurança
         userDetailsManager.createUser(
             User.withUsername(email)
                 .password(passwordEncoder.encode(senha))
@@ -37,7 +35,6 @@ public class CadastroClienteService {
                 .build()
         );
 
-        // 2. Insere os dados cadastrais na tabela 'clientes'
         jdbcTemplate.update(
             "INSERT INTO clientes(cpf, nome, celular, endereco, email) VALUES (?, ?, ?, ?, ?)",
             cpf, nome, celular, endereco, email

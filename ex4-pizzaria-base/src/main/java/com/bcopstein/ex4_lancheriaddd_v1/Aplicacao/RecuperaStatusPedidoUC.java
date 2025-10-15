@@ -19,7 +19,6 @@ public class RecuperaStatusPedidoUC {
     public String run(long pedidoId, String clienteEmail){
         Pedido pedido = pedidosRepository.recuperaPorId(pedidoId);
 
-        // Se o pedido não existe, retorna null.
         if (pedido == null) {
             return null;
         }
@@ -28,7 +27,6 @@ public class RecuperaStatusPedidoUC {
             throw new AccessDeniedException("Acesso negado.");
         }
 
-        // Se tudo estiver certo, retorna o status.
         return pedido.getStatus().name();
     }
 }

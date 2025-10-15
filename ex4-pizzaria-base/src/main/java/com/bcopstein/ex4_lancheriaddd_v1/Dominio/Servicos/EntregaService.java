@@ -12,7 +12,7 @@ import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Dados.PedidosRepository;
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.Pedido;
 
 @Service
-public class EntregaService implements IEntrgaService {
+public class EntregaService implements IEntregaService {
     private final PedidosRepository pedidosRepository;
     private final Queue<Long> filaEntrega = new LinkedBlockingQueue<>();
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -24,7 +24,6 @@ public class EntregaService implements IEntrgaService {
     @Override
     public void enfileirar(long pedidoId){
         filaEntrega.add(pedidoId);
-        // Simula atribuição a entregador e entrega
         scheduler.schedule(() -> {
             pedidosRepository.atualizaStatus(pedidoId, Pedido.Status.TRANSPORTE.name());
             scheduler.schedule(() ->
@@ -32,7 +31,4 @@ public class EntregaService implements IEntrgaService {
                 5, TimeUnit.SECONDS);
         }, 2, TimeUnit.SECONDS);
     }
-
-
-
 }

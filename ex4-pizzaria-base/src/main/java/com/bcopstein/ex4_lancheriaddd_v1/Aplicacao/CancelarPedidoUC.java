@@ -16,11 +16,9 @@ public class CancelarPedidoUC {
         this.pedidos = pedidos;
     }
 
-    // A assinatura do método agora recebe o e-mail do cliente autenticado
     public void run(long pedidoId, String clienteEmail){
         Pedido pedido = pedidos.recuperaPorId(pedidoId);
 
-        // Verificação 1: O pedido existe?
         if (pedido == null) {
             throw new IllegalArgumentException("Pedido inexistente: " + pedidoId);
         }
@@ -33,7 +31,6 @@ public class CancelarPedidoUC {
             throw new IllegalStateException("Somente pedidos com status 'APROVADO' podem ser cancelados.");
         }
 
-        // Se todas as verificações passarem, atualiza o status
         pedidos.atualizaStatus(pedidoId, Pedido.Status.CANCELADO.name());
     }
 }

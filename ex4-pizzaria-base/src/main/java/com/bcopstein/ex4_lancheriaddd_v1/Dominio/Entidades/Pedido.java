@@ -81,7 +81,6 @@ public class Pedido {
         return valorCobrado;
     }
 
-    // GETTER PARA O NOVO CAMPO
     public LocalDate getData_pedido() {
         return data_pedido;
     }

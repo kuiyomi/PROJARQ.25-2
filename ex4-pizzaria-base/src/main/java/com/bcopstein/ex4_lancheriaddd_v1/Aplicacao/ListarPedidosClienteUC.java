@@ -19,17 +19,14 @@ public class ListarPedidosClienteUC {
         this.pedidos = pedidos;
     }
 
-    // Lógica do UC9
     public List<Map<String, Object>> run(String clienteEmail, LocalDate dataInicio, LocalDate dataFim) {
         return pedidos.findPedidosEntreguesPorClienteEntreDatas(clienteEmail, dataInicio, dataFim)
                 .stream()
                 .map(pedido -> {
-                    // A mesma lógica de conversão para Map é aplicada aqui
                     Map<String, Object> pedidoMap = new HashMap<>();
                     pedidoMap.put("pedidoId", pedido.getId());
                     pedidoMap.put("valorCobrado", pedido.getValorCobrado());
                     pedidoMap.put("status", pedido.getStatus().name());
-                    // Adicione outros campos que desejar
                     return pedidoMap;
                 })
                 .collect(Collectors.toList());

@@ -19,17 +19,14 @@ public class ListarPedidosEntreguesUC {
         this.pedidos = pedidos;
     }
 
-    // Lógica do UC8
     public List<Map<String, Object>> run(LocalDate dataInicio, LocalDate dataFim) {
         return pedidos.findPedidosEntreguesEntreDatas(dataInicio, dataFim)
                 .stream()
                 .map(pedido -> {
-                    // Para cada pedido, cria um Map e o preenche
                     Map<String, Object> pedidoMap = new HashMap<>();
                     pedidoMap.put("pedidoId", pedido.getId());
                     pedidoMap.put("valorCobrado", pedido.getValorCobrado());
                     pedidoMap.put("status", pedido.getStatus().name());
-                    // Adicione outros campos que desejar
                     return pedidoMap;
                 })
                 .collect(Collectors.toList());

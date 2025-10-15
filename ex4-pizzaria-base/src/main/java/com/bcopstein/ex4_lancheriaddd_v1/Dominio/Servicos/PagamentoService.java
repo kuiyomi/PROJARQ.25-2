@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.Pedido;
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Dados.PedidosRepository;
-import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Servicos.CozinhaService; // ajuste conforme seu package
+import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Servicos.CozinhaService;
 
 @Service
 public class PagamentoService {

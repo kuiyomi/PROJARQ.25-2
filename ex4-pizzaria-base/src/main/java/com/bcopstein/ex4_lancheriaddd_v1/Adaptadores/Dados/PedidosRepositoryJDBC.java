@@ -104,17 +104,16 @@ public class PedidosRepositoryJDBC implements PedidosRepository {
 
 @Override
 public List<Pedido> findPedidosEntreguesPorClienteEntreDatas(String clienteEmail, java.time.LocalDate dataInicio, java.time.LocalDate dataFim) {
-    String sql = "SELECT p.* " + // Seleciona todas as colunas do pedido
+    String sql = "SELECT p.* " +
                  "FROM pedidos p " +
-                 "JOIN clientes c ON p.cliente_cpf = c.cpf " + // Junta com clientes para filtrar por e-mail
+                 "JOIN clientes c ON p.cliente_cpf = c.cpf " +
                  "WHERE c.email = ? " +
                  "AND p.status = 'ENTREGUE' " +
-                 "AND p.data_pedido BETWEEN ? AND ?"; // Assumindo que você tem uma coluna 'data_pedido'
+                 "AND p.data_pedido BETWEEN ? AND ?";
 
     return jdbcTemplate.query(
         sql,
         (rs, rowNum) -> {
-            // Reutiliza a lógica de buscar o cliente pelo CPF
             String cpf = rs.getString("cliente_cpf");
             var clienteList = jdbcTemplate.query("SELECT * FROM clientes WHERE cpf = ?",
                 ps2 -> ps2.setString(1, cpf),
@@ -122,7 +121,6 @@ public List<Pedido> findPedidosEntreguesPorClienteEntreDatas(String clienteEmail
             );
             Cliente cliente = clienteList.get(0);
 
-            // Reutiliza a lógica de buscar os itens do pedido
             var itens = jdbcTemplate.query("SELECT ip.produto_id, ip.quantidade FROM itens_pedido ip WHERE ip.pedido_id = ?",
                 ps3 -> ps3.setLong(1, rs.getLong("id")),
                 (r3, rn3) -> {
@@ -130,13 +128,11 @@ public List<Pedido> findPedidosEntreguesPorClienteEntreDatas(String clienteEmail
                     return new ItemPedido(prod, r3.getInt("quantidade"));
                 });
             
-            // Constrói o objeto Pedido com todos os dados
             LocalDateTime dh = rs.getTimestamp("data_hora_pagamento") == null ? null : rs.getTimestamp("data_hora_pagamento").toLocalDateTime();
             Pedido.Status status = Pedido.Status.valueOf(rs.getString("status"));
             
             return new Pedido(rs.getLong("id"), cliente, dh, itens, status, rs.getDouble("valor"), rs.getDouble("impostos"), rs.getDouble("desconto"), rs.getDouble("valor_cobrado"));
         },
-        // Parâmetros para a query SQL, na ordem correta
         clienteEmail, dataInicio, dataFim
     );
 }
@@ -150,7 +146,6 @@ public List<Pedido> findPedidosEntreguesEntreDatas(LocalDate dataInicio, LocalDa
     return jdbcTemplate.query(
         sql,
         (rs, rowNum) -> {
-            // Busca o cliente associado pelo CPF
             String cpf = rs.getString("cliente_cpf");
             var clienteList = jdbcTemplate.query("SELECT * FROM clientes WHERE cpf = ?",
                 ps2 -> ps2.setString(1, cpf),
@@ -158,7 +153,6 @@ public List<Pedido> findPedidosEntreguesEntreDatas(LocalDate dataInicio, LocalDa
             );
             Cliente cliente = clienteList.get(0);
 
-            // Busca os itens associados ao pedido
             var itens = jdbcTemplate.query("SELECT ip.produto_id, ip.quantidade FROM itens_pedido ip WHERE ip.pedido_id = ?",
                 ps3 -> ps3.setLong(1, rs.getLong("id")),
                 (r3, rn3) -> {
@@ -166,7 +160,6 @@ public List<Pedido> findPedidosEntreguesEntreDatas(LocalDate dataInicio, LocalDa
                     return new ItemPedido(prod, r3.getInt("quantidade"));
                 });
             
-            // Constrói o objeto Pedido completo com todos os dados
             LocalDateTime dh = rs.getTimestamp("data_hora_pagamento") == null ? null : rs.getTimestamp("data_hora_pagamento").toLocalDateTime();
             Pedido.Status status = Pedido.Status.valueOf(rs.getString("status"));
             

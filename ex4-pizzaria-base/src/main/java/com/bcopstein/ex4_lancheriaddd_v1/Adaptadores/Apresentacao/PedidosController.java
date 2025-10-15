@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.format.annotation.DateTimeFormat;
-// Adicione as importações para ResponseEntity e outros pacotes necessários
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -49,7 +48,6 @@ public class PedidosController {
     public ResponseEntity<PedidoResponse> submeterPedido(@RequestBody PedidoRequest req, Authentication authentication){
         String clienteEmail = authentication.getName();
         PedidoResponse response = submeterPedidoUC.run(req, clienteEmail);
-        // Retorna 201 Created, que é o status correto para criação de um novo recurso.
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -61,7 +59,6 @@ public class PedidosController {
             String status = recuperaStatusPedidoUC.run(id, clienteEmail);
             return ResponseEntity.ok(status);
         } catch (AccessDeniedException e) {
-            // Retorna 403 Forbidden se o usuário não for o dono do pedido
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         }
     }
@@ -76,7 +73,6 @@ public class PedidosController {
         } catch (AccessDeniedException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         } catch (ReaderException e) {
-            // Retorna 409 Conflict se uma regra de negócio impedir o cancelamento
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
     }
@@ -103,9 +99,6 @@ public class PedidosController {
         return listarPedidosEntreguesUC.run(dataInicio, dataFim);
     }
 
-    /**
-     * UC9: Listar os pedidos de um determinado cliente entregues entre duas datas
-     */
     @GetMapping("/meus-pedidos/entregues")
     @CrossOrigin("*")
     public List<Map<String, Object>> listarMeusPedidosEntregues(
