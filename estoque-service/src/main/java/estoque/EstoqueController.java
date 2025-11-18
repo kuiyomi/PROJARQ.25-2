@@ -12,6 +12,11 @@ public class EstoqueController {
 
   public EstoqueController(ItemEstoqueRepository repo){ this.repo = repo; }
 
+  @GetMapping
+  public String home() {
+      return "Estoque-service OK";
+  }
+  
   @GetMapping("/ingrediente/{id}")
   public ResponseEntity<ItemDTO> get(@PathVariable long id){
     var it = repo.recuperaPorIngredienteId(id);
