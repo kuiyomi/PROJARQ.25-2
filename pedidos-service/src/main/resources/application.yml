@@ -1,6 +1,9 @@
 server:
   port: 8081
 spring:
+  cloud:
+    compatibility-verifier:
+      enabled: false
   application:
     name: pedidos-service
   datasource:
@@ -21,3 +24,4 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka
+
