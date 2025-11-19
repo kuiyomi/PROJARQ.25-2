@@ -40,7 +40,7 @@ insert into produto_ingrediente (produto_id, ingrediente_id, quantidade) values 
 insert into produto_ingrediente (produto_id, ingrediente_id, quantidade) values (3, 8, 1);
 
 -- CARDÁPIO
-insert into cardapios (descricao, ativo) values ('Cardapio Principal', true);
+insert into cardapios (titulo, ativo) values ('Cardapio Principal', true);
 -- coloque os 3 produtos no cardápio 1:
 insert into cardapio_produto (cardapio_id, produto_id) values (1, 1);
 insert into cardapio_produto (cardapio_id, produto_id) values (1, 2);
