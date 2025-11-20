@@ -1,30 +1,19 @@
 package com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades;
 
-import java.util.Map;
+import java.util.List;
 
 public class Receita {
-    private Produto produto;
-    // quantidade de cada ingrediente necessário para esse produto
-    private Map<Ingrediente, Integer> ingredientes;
+    private long id;
+    private String titulo;
+    private List<Ingrediente> ingredientes;
 
-    public Receita(Produto produto, Map<Ingrediente, Integer> ingredientes) {
-        this.produto = produto;
+    public Receita(long id, String titulo, List<Ingrediente> ingredientes) {
+        this.id = id;
+        this.titulo = titulo;
         this.ingredientes = ingredientes;
     }
 
-    public Produto getProduto() {
-        return produto;
-    }
-
-    public void setProduto(Produto produto) {
-        this.produto = produto;
-    }
-
-    public Map<Ingrediente, Integer> getIngredientes() {
-        return ingredientes;
-    }
-
-    public void setIngredientes(Map<Ingrediente, Integer> ingredientes) {
-        this.ingredientes = ingredientes;
-    }
+    public long getId() { return id; }
+    public String getTitulo(){ return titulo; }
+    public List<Ingrediente> getIngredientes() { return ingredientes; }
 }

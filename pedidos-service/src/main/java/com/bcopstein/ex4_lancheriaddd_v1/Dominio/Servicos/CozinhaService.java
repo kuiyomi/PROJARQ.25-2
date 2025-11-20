@@ -6,10 +6,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.amqp.core.FanoutExchange;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Dados.PedidosRepository;
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.Pedido;
+import Pedidos.Adaptadores.Mensagens.PedidoParaEntregaDTO;
+import Pedidos.Config.RabbitMQConfig;
 
 @Service
 public class CozinhaService {
@@ -20,11 +24,15 @@ public class CozinhaService {
     private ScheduledExecutorService scheduler;
 
     private final PedidosRepository pedidosRepository;
-    private final EntregaService entregaService;
+    private final RabbitTemplate rabbitTemplate;
+    private final FanoutExchange fanoutExchange;
 
-    public CozinhaService(PedidosRepository pedidosRepository, EntregaService entregaService) {
+    public CozinhaService(PedidosRepository pedidosRepository, 
+                          RabbitTemplate rabbitTemplate,
+                          FanoutExchange fanoutExchange) {
         this.pedidosRepository = pedidosRepository;
-        this.entregaService = entregaService;
+        this.rabbitTemplate = rabbitTemplate;
+        this.fanoutExchange = fanoutExchange;
         filaEntrada = new LinkedBlockingQueue<Pedido>();
         emPreparacao = null;
         filaSaida = new LinkedBlockingQueue<Pedido>();
@@ -33,6 +41,7 @@ public class CozinhaService {
 
     private synchronized void colocaEmPreparacao(Pedido pedido){
         pedido.setStatus(Pedido.Status.PREPARACAO);
+        pedidosRepository.atualizaStatus(pedido.getId(), Pedido.Status.PREPARACAO.name());
         emPreparacao = pedido;
         System.out.println("Pedido em preparacao: "+pedido);
         scheduler.schedule(() -> pedidoPronto(), 5, TimeUnit.SECONDS);
@@ -43,7 +52,7 @@ public class CozinhaService {
         pedidosRepository.atualizaStatus(p.getId(), Pedido.Status.AGUARDANDO.name());
         
         filaEntrada.add(p);
-        System.out.println("Pedido na fila de entrada: "+p);
+        System.out.println("Pedido na fila de entrada da cozinha: "+p);
         if (emPreparacao == null) {
             colocaEmPreparacao(filaEntrada.poll());
         }
@@ -51,10 +60,13 @@ public class CozinhaService {
 
     public synchronized void pedidoPronto() {
         emPreparacao.setStatus(Pedido.Status.PRONTO);
+        pedidosRepository.atualizaStatus(emPreparacao.getId(), Pedido.Status.PRONTO.name());
         filaSaida.add(emPreparacao);
-        System.out.println("Pedido na fila de saida: "+emPreparacao);
+        System.out.println("Pedido pronto, na fila de saída da cozinha: "+emPreparacao);
 
-        entregaService.enfileirar(emPreparacao.getId());
+        PedidoParaEntregaDTO dto = new PedidoParaEntregaDTO(emPreparacao.getId(), emPreparacao.getCliente().getEmail());
+        rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, "", dto);
+        System.out.println("Mensagem de pedido pronto para entrega enviada ao RabbitMQ para o pedido: " + emPreparacao.getId());
 
         emPreparacao = null;
         if (!filaEntrada.isEmpty()){

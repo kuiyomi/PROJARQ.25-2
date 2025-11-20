@@ -10,26 +10,22 @@ import com.bcopstein.ex4_lancheriaddd_v1.Aplicacao.Requests.*;
 import com.bcopstein.ex4_lancheriaddd_v1.Aplicacao.Responses.PedidoResponse;
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.ItemPedido;
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.Produto;
-import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Dados.ProdutosRepository;
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Servicos.PedidoService;
+import com.bcopstein.ex4_lancheriaddd_v1.Dominio.DTO.ProdutoDTO;
 
 @Component
 public class SubmeterPedidoUC {
     private final PedidoService pedidoService;
-    private final ProdutosRepository produtosRepository;
 
     @Autowired
-    public SubmeterPedidoUC(PedidoService pedidoService, ProdutosRepository produtosRepository){
+    public SubmeterPedidoUC(PedidoService pedidoService){ 
         this.pedidoService = pedidoService;
-        this.produtosRepository = produtosRepository;
     }
 
     public PedidoResponse run(PedidoRequest req, String clienteCpf){
         List<ItemPedido> itens = req.itens.stream()
             .map(i -> {
-                var prod = produtosRepository.recuperaProdutoPorid(i.produtoId);
-                if (prod == null) throw new IllegalArgumentException("Produto inexistente: " + i.produtoId);
-                return new ItemPedido(new Produto(prod.getId(), prod.getDescricao(), prod.getReceita(), prod.getPreco()), i.quantidade);
+                return new ItemPedido(new Produto(i.produtoId, "", null, 0), i.quantidade);
             })
             .collect(Collectors.toList());
 

@@ -1,4 +1,4 @@
-package pedidos.dados.externo;
+package Pedidos.Dados.Externo;
 
 import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;

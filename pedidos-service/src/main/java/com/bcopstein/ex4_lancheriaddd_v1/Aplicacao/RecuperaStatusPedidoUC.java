@@ -1,7 +1,6 @@
 package com.bcopstein.ex4_lancheriaddd_v1.Aplicacao;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Dados.PedidosRepository;
@@ -20,11 +19,11 @@ public class RecuperaStatusPedidoUC {
         Pedido pedido = pedidosRepository.recuperaPorId(pedidoId);
 
         if (pedido == null) {
-            return null;
+            throw new IllegalArgumentException("Pedido inexistente: " + pedidoId);
         }
 
         if (!pedido.getCliente().getEmail().equals(clienteEmail)) {
-            throw new AccessDeniedException("Acesso negado.");
+            throw new IllegalStateException("Acesso negado. O pedido não pertence a este cliente.");
         }
 
         return pedido.getStatus().name();

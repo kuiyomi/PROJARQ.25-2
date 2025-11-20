@@ -2,6 +2,9 @@ package com.bcopstein.ex4_lancheriaddd_v1.Dominio.Servicos;
 
 import java.util.*;
 
+import com.bcopstein.ex4_lancheriaddd_v1.Clientes.EstoqueClient; 
+import com.bcopstein.ex4_lancheriaddd_v1.Dominio.DTO.ProdutoDTO; 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,32 +13,29 @@ import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.*;
 
 @Service
 public class PedidoService {
-    private final ProdutosRepository produtosRepository;
     private final ReceitasRepository receitasRepository;
-    private final IngredientesRepository ingredientesRepository;
-    private final ItemEstoqueRepository itemEstoqueRepository;
+
     private final PedidosRepository pedidosRepository;
     private final ImpostoService impostoService;
     private final DescontoService descontoService;
+
     @Autowired
     private PagamentoService pagamentoService;
     @Autowired
     private CozinhaService cozinhaService;
 
-    public PedidoService(ProdutosRepository produtosRepository,
+    private final EstoqueClient estoqueClient; 
+    public PedidoService(
             ReceitasRepository receitasRepository,
-            IngredientesRepository ingredientesRepository,
-            ItemEstoqueRepository itemEstoqueRepository,
             PedidosRepository pedidosRepository,
             ImpostoService impostoService,
-            DescontoService descontoService) {
-        this.produtosRepository = produtosRepository;
+            DescontoService descontoService,
+            EstoqueClient estoqueClient) {
         this.receitasRepository = receitasRepository;
-        this.ingredientesRepository = ingredientesRepository;
-        this.itemEstoqueRepository = itemEstoqueRepository;
         this.pedidosRepository = pedidosRepository;
         this.impostoService = impostoService;
         this.descontoService = descontoService;
+        this.estoqueClient = estoqueClient;
     }
 
     public static class ResultadoAprovacao {
@@ -59,14 +59,16 @@ public class PedidoService {
         }
     }
 
-    // submete pedido para aprovação: retorna ResultadoAprovacao. Não faz pagamento.
     public ResultadoAprovacao submeteParaAprovacao(String clienteCpf, List<ItemPedido> itens) {
-        // produtos indisponiveis
         List<Long> produtosIndisponiveis = new ArrayList<>();
+        Map<Long, ProdutoDTO> produtosNoEstoque = new HashMap<>();
+
         for (ItemPedido itemPedido : itens) {
-            Produto produto = produtosRepository.recuperaProdutoPorid(itemPedido.getItem().getId());
-            if (produto == null) {
+            Optional<ProdutoDTO> produtoOpt = estoqueClient.getProdutoById(itemPedido.getItem().getId());
+            if (produtoOpt.isEmpty()) {
                 produtosIndisponiveis.add(itemPedido.getItem().getId());
+            } else {
+                produtosNoEstoque.put(itemPedido.getItem().getId(), produtoOpt.get());
             }
         }
 
@@ -74,10 +76,9 @@ public class PedidoService {
             return new ResultadoAprovacao(false, produtosIndisponiveis, 0, 0, 0, 0, -1);
         }
 
-        // se tiver tudo ok, calcula preço
         double soma = 0.0;
         for (ItemPedido ip : itens) {
-            Produto p = produtosRepository.recuperaProdutoPorid(ip.getItem().getId());
+            ProdutoDTO p = produtosNoEstoque.get(ip.getItem().getId());
             soma += ((double) p.getPreco()) * ip.getQuantidade();
         }
         double descontoPercent = descontoService.percentualDescontoSeElegivel(clienteCpf);
@@ -86,14 +87,10 @@ public class PedidoService {
         double impostos = impostoService.calculaImposto(base);
         double valorCobrado = base + impostos;
 
-        // salva pedido (status APROVADO)
         long pedidoId = pedidosRepository.inserePedido(clienteCpf, Pedido.Status.APROVADO.name(), soma, impostos,
                 desconto, valorCobrado);
         pedidosRepository.insereItensPedido(pedidoId, itens);
 
         return new ResultadoAprovacao(true, List.of(), soma, desconto, impostos, valorCobrado, pedidoId);
     }
-
-    
-
 }
