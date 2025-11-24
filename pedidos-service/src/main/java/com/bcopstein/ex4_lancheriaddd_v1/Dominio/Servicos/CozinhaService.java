@@ -6,12 +6,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Dados.PedidosRepository;
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.Pedido;
+
 import Pedidos.Adaptadores.Mensagens.PedidoParaEntregaDTO;
 import Pedidos.Config.RabbitMQConfig;
 
@@ -25,18 +25,15 @@ public class CozinhaService {
 
     private final PedidosRepository pedidosRepository;
     private final RabbitTemplate rabbitTemplate;
-    private final FanoutExchange fanoutExchange;
 
     public CozinhaService(PedidosRepository pedidosRepository, 
-                          RabbitTemplate rabbitTemplate,
-                          FanoutExchange fanoutExchange) {
+                          RabbitTemplate rabbitTemplate) {
         this.pedidosRepository = pedidosRepository;
         this.rabbitTemplate = rabbitTemplate;
-        this.fanoutExchange = fanoutExchange;
-        filaEntrada = new LinkedBlockingQueue<Pedido>();
-        emPreparacao = null;
-        filaSaida = new LinkedBlockingQueue<Pedido>();
-        scheduler = Executors.newSingleThreadScheduledExecutor();
+        this.filaEntrada = new LinkedBlockingQueue<>();
+        this.emPreparacao = null;
+        this.filaSaida = new LinkedBlockingQueue<>();
+        this.scheduler = Executors.newSingleThreadScheduledExecutor();
     }
 
     private synchronized void colocaEmPreparacao(Pedido pedido){
@@ -44,7 +41,7 @@ public class CozinhaService {
         pedidosRepository.atualizaStatus(pedido.getId(), Pedido.Status.PREPARACAO.name());
         emPreparacao = pedido;
         System.out.println("Pedido em preparacao: "+pedido);
-        scheduler.schedule(() -> pedidoPronto(), 5, TimeUnit.SECONDS);
+        scheduler.schedule(this::pedidoPronto, 5, TimeUnit.SECONDS);
     }
 
     public synchronized void chegadaDePedido(Pedido p) {
