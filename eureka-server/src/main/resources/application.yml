@@ -7,3 +7,11 @@ eureka:
   client:
     register-with-eureka: false
     fetch-registry: false
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: "*"

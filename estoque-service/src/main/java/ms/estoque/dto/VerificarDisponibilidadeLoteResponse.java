@@ -1,0 +1,32 @@
+package ms.estoque.dto;
+
+import java.util.List;
+
+public class VerificarDisponibilidadeLoteResponse {
+    private boolean todosDisponiveis;
+    private List<Long> ingredientesIndisponiveis;
+
+    public VerificarDisponibilidadeLoteResponse() {
+    }
+
+    public VerificarDisponibilidadeLoteResponse(boolean todosDisponiveis, List<Long> ingredientesIndisponiveis) {
+        this.todosDisponiveis = todosDisponiveis;
+        this.ingredientesIndisponiveis = ingredientesIndisponiveis;
+    }
+
+    public boolean isTodosDisponiveis() {
+        return todosDisponiveis;
+    }
+
+    public void setTodosDisponiveis(boolean todosDisponiveis) {
+        this.todosDisponiveis = todosDisponiveis;
+    }
+
+    public List<Long> getIngredientesIndisponiveis() {
+        return ingredientesIndisponiveis;
+    }
+
+    public void setIngredientesIndisponiveis(List<Long> ingredientesIndisponiveis) {
+        this.ingredientesIndisponiveis = ingredientesIndisponiveis;
+    }
+}

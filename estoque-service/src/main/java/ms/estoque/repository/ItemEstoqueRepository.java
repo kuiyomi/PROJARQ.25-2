@@ -1,12 +1,11 @@
-package estoque.adaptadores.repositorios;
+package ms.estoque.repository;
 
-import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.ItemEstoque;
+import ms.estoque.entity.ItemEstoque;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
 import java.util.Optional;
 
 @Repository
-public interface ItemEstoqueJpaRepository extends JpaRepository<ItemEstoque, Long> {
+public interface ItemEstoqueRepository extends JpaRepository<ItemEstoque, Long> {
     Optional<ItemEstoque> findByIngredienteId(Long ingredienteId);
 }
