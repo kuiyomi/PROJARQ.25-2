@@ -11,8 +11,6 @@ public class Produto {
             throw new IllegalArgumentException("Preco invalido: " + preco);
         if (descricao == null || descricao.length() == 0)
             throw new IllegalArgumentException("Descricao invalida");
-        if (receita == null)
-            throw new IllegalArgumentException("Receita invalida");
         this.id = id;
         this.descricao = descricao;
         this.receita = receita;
@@ -43,7 +41,7 @@ public class Produto {
 
     // Valida um preco (preco em centavos)
     public static boolean precoValido(int preco) {
-        return preco > 0;
+        return preco >= 0;
     }
 
     @Override
