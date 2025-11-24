@@ -1,12 +1,10 @@
-package estoque;
+package ms.Estoque; 
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
-@SpringBootApplication(
-  scanBasePackages = { "estoque", "com.bcopstein.ex4_lancheriaddd_v1" }
-)
+@SpringBootApplication
 @EnableDiscoveryClient
 public class EstoqueServiceApplication {
   public static void main(String[] args) {
