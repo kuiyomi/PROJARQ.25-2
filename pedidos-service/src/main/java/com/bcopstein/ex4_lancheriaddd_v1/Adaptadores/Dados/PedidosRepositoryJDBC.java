@@ -100,7 +100,8 @@ public class PedidosRepositoryJDBC implements PedidosRepository {
         Pedido.Status.PAGO.name(),
         dataHora == null ? null : Timestamp.valueOf(dataHora),
         id);
-}
+    }
+    
 
 @Override
 public List<Pedido> findPedidosEntreguesPorClienteEntreDatas(String clienteEmail, java.time.LocalDate dataInicio, java.time.LocalDate dataFim) {

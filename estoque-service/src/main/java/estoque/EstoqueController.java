@@ -13,7 +13,7 @@ public class EstoqueController {
   public EstoqueController(ItemEstoqueRepository repo){ this.repo = repo; }
 
   @GetMapping
-  public String home() {
+  public String status() {
       return "Estoque-service OK";
   }
   
