@@ -13,8 +13,8 @@ public interface PedidosRepository {
     Pedido recuperaPorId(long id);
     int contaPedidosClienteEntre(String cpf, LocalDateTime de, LocalDateTime ate);
     void atualizaStatus(long id, String status);
-    void registraPagamento(long id, java.time.LocalDateTime dataHora);
+    void registraPagamento(long id, LocalDateTime dataHora);
+
     List<Pedido> findPedidosEntreguesPorClienteEntreDatas(String clienteEmail, LocalDate dataInicio, LocalDate dataFim);
     List<Pedido> findPedidosEntreguesEntreDatas(LocalDate dataInicio, LocalDate dataFim);
-
 }

@@ -1,5 +1,6 @@
 server:
   port: 8080
+
 spring:
   application:
     name: api-gateway
@@ -8,10 +9,18 @@ spring:
       routes:
         - id: pedidos
           uri: lb://pedidos-service
-          predicates: [ Path=/api/** ]
+          predicates:
+            - Path=/api/pedidos/**
+          filters:
+            - StripPrefix=1
+
         - id: estoque
           uri: lb://estoque-service
-          predicates: [ Path=/estoque/** ]
+          predicates:
+            - Path=/api/estoque/**
+          filters:
+            - StripPrefix=1
+
 eureka:
   client:
     serviceUrl:

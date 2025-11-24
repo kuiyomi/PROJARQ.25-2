@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.bcopstein.ex4_lancheriaddd_v1.Aplicacao.Requests.*;
+import com.bcopstein.ex4_lancheriaddd_v1.Aplicacao.Requests.PedidoRequest;
 import com.bcopstein.ex4_lancheriaddd_v1.Aplicacao.Responses.PedidoResponse;
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.ItemPedido;
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.Produto;
@@ -29,17 +29,17 @@ public class SubmeterPedidoUC {
             })
             .collect(Collectors.toList());
 
-
         var res = pedidoService.submeteParaAprovacao(clienteCpf, itens);
-        
-        PedidoResponse r = new PedidoResponse();
-        r.aprovado = res.aprovado;
-        r.produtosIndisponiveis = res.produtosIndisponiveis;
-        r.valor = res.valor;
-        r.desconto = res.desconto;
-        r.impostos = res.impostos;
-        r.valorCobrado = res.valorCobrado;
-        r.pedidoId = res.pedidoId;
-        return r;
+
+        // Agora criamos o DTO usando o construtor com campos privados/getters
+        return new PedidoResponse(
+            res.aprovado,
+            res.produtosIndisponiveis,
+            res.valor,
+            res.desconto,
+            res.impostos,
+            res.valorCobrado,
+            res.pedidoId
+        );
     }
 }

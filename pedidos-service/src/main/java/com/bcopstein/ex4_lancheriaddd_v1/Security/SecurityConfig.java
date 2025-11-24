@@ -14,7 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
-    // continua existindo porque o ClienteController usa isso para registrar clientes
+    // Continua existindo porque o ClienteController usa isso para registrar clientes
     @Bean
     public JdbcUserDetailsManager users(DataSource dataSource) {
         return new JdbcUserDetailsManager(dataSource);
@@ -28,13 +28,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            // sem CSRF (API REST)
+            // Sem CSRF (API REST)
             .csrf(AbstractHttpConfigurer::disable)
-            // *** TUDO liberado ***
+            // Tudo liberado no microserviço de pedidos
             .authorizeHttpRequests(auth -> auth
                 .anyRequest().permitAll()
             )
-            // desliga os mecanismos de login padrão (basic / form)
+            // Desliga basic/form login aqui (quem autentica é o gateway)
             .httpBasic(AbstractHttpConfigurer::disable)
             .formLogin(AbstractHttpConfigurer::disable);
 
